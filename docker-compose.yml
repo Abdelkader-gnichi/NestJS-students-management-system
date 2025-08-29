@@ -1,0 +1,43 @@
+services:
+  student_management:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - '3000:3000'
+    volumes:
+      - ./src:/app/src
+    develop:
+      watch:
+        - action: rebuild
+          path: Dockerfile
+        - action: rebuild
+          path: package*.json
+        - action: rebuild
+          path: docker-compose.yml
+    depends_on:
+      pg_student_mgm_db:
+        condition: service_healthy
+
+  pg_student_mgm_db:
+    image: postgres:17.6-alpine3.21@sha256:0e565e87530d57715ae647b808e3f4039c693acbd37b0ed401ba7f5f92cbdf34
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+    ports:
+      - ${POSTGRES_PORT:-5432}:${POSTGRES_PORT:-5432}
+    expose:
+      - ${POSTGRES_HOST:-5432}
+    volumes:
+      - pg_student_mgm_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pg_student_mgm_db_data:
