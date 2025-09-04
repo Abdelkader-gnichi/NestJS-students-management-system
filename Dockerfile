@@ -1,4 +1,4 @@
-FROM node:lts-trixie-slim@sha256:ba533b824f504e19137d3c961f8f6ef5278b02d8bfa7010eabb1b836d3125ce4 as builder
+FROM node:lts-trixie-slim@sha256:ba533b824f504e19137d3c961f8f6ef5278b02d8bfa7010eabb1b836d3125ce4 AS builder
 
 WORKDIR /app
 
@@ -18,9 +18,11 @@ RUN apt-get update && \
 
 
 COPY ./src ./src
+COPY .env ./.env
 
 COPY --from=builder /app/node_modules /app/node_modules
 COPY --from=builder /app/package*.json /app/
 COPY --from=builder /app/tsconfig*.json /app/
+
 
 CMD ["npm", "run", "start:dev"]
