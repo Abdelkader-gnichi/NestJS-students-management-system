@@ -39,5 +39,15 @@ services:
       timeout: 5s
       retries: 5
 
+  pgadmin:
+    image: dpage/pgadmin4
+    ports:
+      - '5050:80'
+    environment:
+      PGADMIN_DEFAULT_EMAIL: abdelkader.gnichi15@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: ${POSTGRES_PASSWORD}
+    depends_on:
+      - pg_student_mgm_db
+
 volumes:
   pg_student_mgm_db_data:
