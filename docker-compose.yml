@@ -5,16 +5,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - '3000:3000'
-    volumes:
-      - ./src:/app/src
-    develop:
-      watch:
-        - action: rebuild
-          path: Dockerfile
-        - action: rebuild
-          path: package*.json
-        - action: rebuild
-          path: docker-compose.yml
     depends_on:
       pg_student_mgm_db:
         condition: service_healthy
