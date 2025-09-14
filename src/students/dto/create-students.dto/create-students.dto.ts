@@ -8,4 +8,7 @@ export class CreateStudentsDto {
   @IsOptional()
   @IsString({ each: true })
   readonly address: string[];
+
+  @IsString({ each: true })
+  readonly courses: string[];
 }

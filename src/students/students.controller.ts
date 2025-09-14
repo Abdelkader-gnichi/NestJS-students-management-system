@@ -31,18 +31,17 @@ export class StudentsController {
   }
 
   @Post()
-  // @HttpCode(HttpStatus.GONE) // this is another way to set status code
+  @HttpCode(HttpStatus.CREATED) // this is another way to set status code
   async createStudent(
     @Body() createStudentDto: CreateStudentsDto,
-    @Res() response: Response,
   ): Promise<{ message: string; student: Student }> {
     // by default nestjs handles the status code automatically for you, just return body
     // return this.studentService.create(createStudentDto);
     const createdStudent = await this.studentService.create(createStudentDto);
-    return response.status(201).json({
+    return {
       message: 'Student created successfully',
       student: createdStudent,
-    });
+    };
   }
 
   @Put(':id')

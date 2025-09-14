@@ -4,20 +4,26 @@ import { Student } from './entities/student.entity';
 import { DeleteResult, Repository } from 'typeorm';
 import { CreateStudentsDto } from './dto/create-students.dto/create-students.dto';
 import { UpdateStudentDto } from './dto/update-student.dto/update-student.dto';
+import { Course } from './entities/course.entity';
 
 @Injectable()
 export class StudentsService {
   constructor(
     @InjectRepository(Student)
     private readonly studentRepository: Repository<Student>,
+    @InjectRepository(Course)
+    private readonly courseRepository: Repository<Course>,
   ) {}
 
   async findAll(): Promise<Student[]> {
-    return this.studentRepository.find();
+    return this.studentRepository.find({ relations: ['courses'] });
   }
 
   async findOne(id: number): Promise<Student> {
-    const student = await this.studentRepository.findOne({ where: { id } });
+    const student = await this.studentRepository.findOne({
+      where: { id },
+      relations: ['courses'],
+    });
 
     if (!student) {
       throw new NotFoundException(`student with id ${id} not found`);
@@ -27,7 +33,14 @@ export class StudentsService {
   }
 
   async create(createStudentDto: CreateStudentsDto): Promise<Student> {
-    const student = this.studentRepository.create({ ...createStudentDto });
+    const courses = await Promise.all(
+      createStudentDto.courses.map((x) => this.preloadCourseByName(x)),
+    );
+
+    const student = this.studentRepository.create({
+      ...createStudentDto,
+      courses,
+    });
     return this.studentRepository.save(student);
   }
 
@@ -35,9 +48,15 @@ export class StudentsService {
     id: number,
     updateStudentDto: UpdateStudentDto,
   ): Promise<Student> {
+    const courses =
+      updateStudentDto.courses &&
+      (await Promise.all(
+        updateStudentDto.courses.map((x) => this.preloadCourseByName(x)),
+      ));
     const student = await this.studentRepository.preload({
       id,
       ...updateStudentDto,
+      courses,
     });
 
     if (!student) {
@@ -67,5 +86,15 @@ export class StudentsService {
     // }
 
     // return this.studentRepository.remove(student);
+  }
+
+  private async preloadCourseByName(name: string): Promise<Course> {
+    const course = await this.courseRepository.findOne({ where: { name } });
+
+    if (!course) {
+      return this.courseRepository.create({ name });
+    }
+
+    return course;
   }
 }
