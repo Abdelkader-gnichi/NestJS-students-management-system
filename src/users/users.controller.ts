@@ -1,15 +1,11 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpStatus,
-  Post,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
-import { User } from './entities/user.entity';
 import { SignInDto } from './dto/singin-users.dto/signin-users.dto';
+import { JwtAuthGuard } from 'src/auth/jwt.guard';
+import { RoleGuard } from 'src/auth/role/role.guard';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { SignUpDto } from './dto/singin-users.dto/signup-users.dto';
+import type { Request } from 'express';
 
 @Controller('users')
 export class UsersController {
@@ -21,8 +17,8 @@ export class UsersController {
   }
 
   @Post()
-  userSignUp(@Body() user) {
-    return this.userService.signUp(user);
+  userSignUp(@Body() signUpDto: SignUpDto) {
+    return this.userService.signUp(signUpDto);
   }
 
   @Post('login')
@@ -30,5 +26,10 @@ export class UsersController {
     return this.userService.signIn(signInDto.userName, signInDto.password);
   }
 
-  
+  @Roles('admin', 'user')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Get('profile')
+  userProfile(@Req() request: Request) {
+    return request.user;
+  }
 }

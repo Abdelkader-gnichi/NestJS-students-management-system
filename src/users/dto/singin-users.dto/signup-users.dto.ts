@@ -1,8 +1,10 @@
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsStrongPassword,
+  IsUUID,
 } from 'class-validator';
 
 export class SignUpDto {
@@ -14,6 +16,8 @@ export class SignUpDto {
   @IsStrongPassword()
   readonly password: string;
 
+  @IsOptional()
+  @IsUUID()
   @IsString()
   userUUID: string;
 

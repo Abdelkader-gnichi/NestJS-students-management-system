@@ -4,7 +4,6 @@ import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { sign } from 'jsonwebtoken';
 
-
 @Injectable()
 export class UsersService {
   constructor(
