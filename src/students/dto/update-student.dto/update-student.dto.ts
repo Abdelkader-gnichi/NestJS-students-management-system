@@ -1,5 +1,4 @@
 import { PartialType } from '@nestjs/mapped-types';
-import { IsNumber, IsString } from 'class-validator';
 import { CreateStudentsDto } from '../create-students.dto/create-students.dto';
 
 export class UpdateStudentDto extends PartialType(CreateStudentsDto) {
